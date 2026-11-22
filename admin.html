@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin MiniLux | Gestion Boutique</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--gold:#b8732e;--gold2:#d4a72c;--dark:#161616;--bg:#faf6f3;--card:#fff;--border:#ece4de;--txt:#555b6e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--dark);line-height:1.5}
+h1,h2,h3{font-family:'Cinzel',serif}
+.wrap{max-width:1120px;margin:auto;padding:24px 18px}
+.login-box{max-width:410px;margin:70px auto;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px;box-shadow:0 12px 30px rgba(0,0,0,.06)}
+.login-box h1{font-size:24px;text-align:center;margin-bottom:6px}
+.login-box p{text-align:center;font-size:13px;color:var(--txt);margin-bottom:22px}
+label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;margin:12px 0 5px}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid #ddd;border-radius:10px;font-family:inherit;font-size:14px;background:#fff}
+textarea{min-height:80px;resize:vertical}
+.btn{background:var(--dark);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;justify-content:center}
+.btn:hover{opacity:.92}
+.btn.gold{background:linear-gradient(90deg,var(--gold2),var(--gold))}
+.btn.sm{padding:7px 11px;font-size:12px}
+.btn.danger{background:#dc2626}
+.btn.light{background:#f3f4f6;color:var(--dark)}
+.msg{margin-top:12px;font-size:13px;min-height:20px;color:#b91c1c}
+.topbar{background:var(--dark);color:#fff;padding:14px 20px;border-radius:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:22px}
+.topbar .brand{font-family:'Cinzel',serif;font-size:20px;font-weight:700}
+.topbar .brand i{color:var(--gold2);margin-right:6px}
+.topbar .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.tab{background:#fff;border:1px solid var(--border);padding:10px 18px;border-radius:30px;font-weight:600;font-size:13px;cursor:pointer}
+.tab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.panel{display:none}
+.panel.active{display:block}
+.grid2{display:grid;grid-template-columns:370px 1fr;gap:22px;align-items:start}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 4px 14px rgba(0,0,0,.03)}
+.card h2{font-size:18px;margin-bottom:14px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:11px 10px;border-bottom:1px solid #f0ece8;text-align:left;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;color:var(--txt);background:#fcfaf8}
+.thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;background:#f3f4f6}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#fef3c7;color:#92400e}
+.items-list{font-size:12px;color:var(--txt)}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-box">
+ <h1><i class="fa-solid fa-crown" style="color:var(--gold)"></i> MiniLux Admin</h1>
+ <p>Connexion réservée aux administrateurs</p>
+ <label>Email</label>
+ <input type="email" id="email" placeholder="admin@minilux.tn">
+ <label>Mot de passe</label>
+ <input type="password" id="password" placeholder="••••••••">
+ <button class="btn gold" style="width:100%;margin-top:18px" onclick="loginAdmin()"><i class="fa-solid fa-right-to-bracket"></i> Se connecter</button>
+ <div class="msg" id="loginMsg"></div>
+</div>
+
+<div id="appView" class="wrap" style="display:none">
+ <div class="topbar">
+  <div class="brand"><i class="fa-solid fa-crown"></i> MiniLux — Administration</div>
+  <div class="right">
+   <span id="adminEmail" style="font-size:12px;color:#e5e7eb"></span>
+   <a href="index.html" class="btn sm light"><i class="fa-solid fa-store"></i> Voir le site</a>
+   <button class="btn sm danger" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+  </div>
+ </div>
+
+ <div class="tabs">
+  <button class="tab active" data-tab="produitsTab" onclick="switchTab('produitsTab', this)"><i class="fa-solid fa-box"></i> Produits</button>
+  <button class="tab" data-tab="commandesTab" onclick="switchTab('commandesTab', this)"><i class="fa-solid fa-clipboard-list"></i> Commandes</button>
+  <button class="tab" data-tab="messagesTab" onclick="switchTab('messagesTab', this)"><i class="fa-solid fa-comments"></i> Avis Clients</button>
+ </div>
+
+ <!-- Onglet Produits -->
+ <section id="produitsTab" class="panel active">
+  <div class="grid2">
+   <div class="card">
+    <h2 id="formTitle">Ajouter un produit</h2>
+    <input type="hidden" id="pid">
+    <label>Marque</label>
+    <input id="brand" placeholder="Ex: Dior Paris">
+    <label>Nom du produit</label>
+    <input id="name" placeholder="Ex: Sauvage Elixir">
+    <label>Format</label>
+    <input id="fmt" value="Format 10ml" placeholder="Ex: Format 10ml">
+    <label>Catégorie</label>
+    <select id="cat">
+     <option value="femme">Parfums Femme</option>
+     <option value="homme">Parfums Homme</option>
+     <option value="skin">Skincare &amp; Soins</option>
+     <option value="coffret">Coffrets Cadeaux</option>
+    </select>
+    <label>Section sur la boutique</label>
+    <select id="section">
+     <option value="black_friday">Early Black Friday</option>
+     <option value="bestsellers" selected>Best Sellers</option>
+     <option value="nouveaux">Nouveaux Produits</option>
+    </select>
+    <label>Badge / Tag</label>
+    <input id="tag" value="Nouveau" placeholder="Ex: Best Seller">
+    <label>Ancien prix (DT)</label>
+    <input type="number" id="old" value="0" min="0" step="0.5">
+    <label>Prix MiniLux (DT)</label>
+    <input type="number" id="price" required min="0" step="0.5" placeholder="Ex: 49">
+    <label>URL de l'image</label>
+    <input id="img" placeholder="https://...">
+    <label>Description du produit</label>
+    <textarea id="description" placeholder="Format miniature pratique et élégant pour tester la fragrance au quotidien ou en voyage, conditionné avec soin par MiniLux."></textarea>
+    <div style="display:flex;gap:8px;margin-top:16px">
+     <button class="btn gold" style="flex:1" onclick="saveProduct()"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+     <button class="btn light" onclick="resetForm()">Réinitialiser</button>
+    </div>
+    <div class="msg" id="prodMsg"></div>
+   </div>
+
+   <div class="card">
+    <h2>Liste des produits</h2>
+    <div class="table-wrap">
+     <table>
+      <thead>
+       <tr>
+        <th>Image</th>
+        <th>Produit</th>
+        <th>Catégorie / Section</th>
+        <th>Prix</th>
+        <th>Actions</th>
+       </tr>
+      </thead>
+      <tbody id="prodRows"></tbody>
+     </table>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- Onglet Commandes -->
+ <section id="commandesTab" class="panel">
+  <div class="card">
+   <h2>Commandes reçues</h2>
+   <div class="table-wrap">
+    <table>
+     <thead>
+      <tr>
+       <th>#</th>
+       <th>Client</th>
+       <th>Lieu &amp; Adresse</th>
+       <th>Articles</th>
+       <th>Total</th>
+       <th>Statut</th>
+      </tr>
+     </thead>
+     <tbody id="orderRows"></tbody>
+    </table>
+   </div>
+  </div>
+ </section>
+
+ <!-- Onglet Avis -->
+ <section id="messagesTab" class="panel">
+  <div class="card">
+   <h2>Avis &amp; Commentaires clients</h2>
+   <div class="table-wrap">
+    <table>
+     <thead>
+      <tr>
+       <th>Client</th>
+       <th>Note</th>
+       <th>Commentaire</th>
+       <th>Action</th>
+      </tr>
+     </thead>
+     <tbody id="msgRows"></tbody>
+    </table>
+   </div>
+  </div>
+ </section>
+</div>
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const $ = id => document.getElementById(id);
+let sb = null;
+let productsCache = [];
+
+const sectionLabels = {
+ black_friday: 'Early Black Friday',
+ bestsellers: 'Best Sellers',
+ nouveaux: 'Nouveaux Produits'
+};
+
+function esc(s) {
+ return String(s ?? '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+function initClient() {
+ if (!window.supabase || typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_KEY === 'undefined') {
+  $('loginMsg').textContent = "Vérifiez js/config.js et le chargement de Supabase.";
+  return false;
+ }
+ if (!sb) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+ return true;
+}
+
+async function verifyAdminUser(user) {
+ const { data, error } = await sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+ if (error || !data) {
+  await sb.auth.signOut();
+  $('loginMsg').textContent = "Ce compte n'est pas administrateur.";
+  return false;
+ }
+ return true;
+}
+
+async function loginAdmin() {
+ $('loginMsg').textContent = '';
+ if (!initClient()) return;
+ const email = $('email').value.trim();
+ const password = $('password').value;
+ if (!email || !password) {
+  $('loginMsg').textContent = "Veuillez saisir l'email et le mot de passe.";
+  return;
+ }
+ const { data, error } = await sb.auth.signInWithPassword({ email, password });
+ if (error) {
+  $('loginMsg').textContent = error.message;
+  return;
+ }
+ if (await verifyAdminUser(data.user)) {
+  showDashboard(data.user);
+ }
+}
+
+async function logoutAdmin() {
+ if (sb) await sb.auth.signOut();
+ $('appView').style.display = 'none';
+ $('loginView').style.display = 'block';
+}
+
+function switchTab(tabId, btn) {
+ document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+ document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+ btn.classList.add('active');
+ $(tabId).classList.add('active');
+}
+
+function resetForm() {
+ $('pid').value = '';
+ $('formTitle').textContent = 'Ajouter un produit';
+ $('brand').value = '';
+ $('name').value = '';
+ $('fmt').value = 'Format 10ml';
+ $('cat').value = 'femme';
+ $('section').value = 'bestsellers';
+ $('tag').value = 'Nouveau';
+ $('old').value = '0';
+ $('price').value = '';
+ $('img').value = '';
+ $('description').value = '';
+ $('prodMsg').textContent = '';
+}
+
+function editProduct(id) {
+ const p = productsCache.find(x => x.id === id);
+ if (!p) return;
+ $('pid').value = p.id;
+ $('formTitle').textContent = 'Modifier le produit #' + p.id;
+ $('brand').value = p.brand || '';
+ $('name').value = p.name || '';
+ $('fmt').value = p.fmt || 'Format 10ml';
+ $('cat').value = p.cat || 'femme';
+ $('section').value = p.section || 'bestsellers';
+ $('tag').value = p.tag || 'Nouveau';
+ $('old').value = p.old ?? 0;
+ $('price').value = p.price ?? 0;
+ $('img').value = p.img || '';
+ $('description').value = p.description || '';
+ switchTab('produitsTab', document.querySelector('.tab[data-tab="produitsTab"]'));
+}
+
+async function saveProduct() {
+ $('prodMsg').textContent = '';
+ const id = $('pid').value;
+ const payload = {
+  brand: $('brand').value.trim(),
+  name: $('name').value.trim(),
+  fmt: $('fmt').value.trim() || 'Format 10ml',
+  cat: $('cat').value,
+  section: $('section').value || 'bestsellers',
+  tag: $('tag').value.trim() || 'Nouveau',
+  old: parseFloat($('old').value) || 0,
+  price: parseFloat($('price').value),
+  img: $('img').value.trim() || 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=500',
+  description: $('description').value.trim()
+ };
+ if (!payload.brand || !payload.name || Number.isNaN(payload.price)) {
+  $('prodMsg').textContent = "Remplissez la marque, le nom et le prix.";
+  return;
+ }
+ const res = id
+  ? await sb.from('produits').update(payload).eq('id', id)
+  : await sb.from('produits').insert([payload]);
+
+ if (res.error) {
+  $('prodMsg').textContent = res.error.message;
+  return;
+ }
+ resetForm();
+ await loadProducts();
+}
+
+async function deleteProduct(id) {
+ if (!confirm('Supprimer ce produit ?')) return;
+ const { error } = await sb.from('produits').delete().eq('id', id);
+ if (error) { alert(error.message); return; }
+ await loadProducts();
+}
+
+async function loadProducts() {
+ const { data, error } = await sb.from('produits').select('*').order('id', { ascending: true });
+ if (error) { $('prodRows').innerHTML = `<tr><td colspan="5">${esc(error.message)}</td></tr>`; return; }
+ productsCache = data || [];
+ $('prodRows').innerHTML = productsCache.map(p => `
+  <tr>
+   <td><img class="thumb" src="${esc(p.img)}" alt="${esc(p.name)}" onerror="this.style.display='none'"></td>
+   <td><b>${esc(p.name)}</b><br><span style="font-size:11px;color:#777">${esc(p.brand)} • ${esc(p.fmt)}</span></td>
+   <td>${esc(p.cat)}<br><span style="font-size:11px;color:var(--gold);font-weight:600">${esc(sectionLabels[p.section] || p.section || 'Best Sellers')}</span></td>
+   <td><b>${Number(p.price).toFixed(2)} DT</b></td>
+   <td>
+    <button class="btn sm light" onclick="editProduct(${p.id})">Modifier</button>
+    <button class="btn sm danger" onclick="deleteProduct(${p.id})">Supprimer</button>
+   </td>
+  </tr>
+ `).join('');
+}
+
+async function updateOrderStatus(id, statut) {
+ const { error } = await sb.from('commandes').update({ statut }).eq('id', id);
+ if (error) alert(error.message);
+}
+
+async function loadOrders() {
+ const { data, error } = await sb.from('commandes').select('*').order('id', { ascending: false });
+ if (error) { $('orderRows').innerHTML = `<tr><td colspan="6">${esc(error.message)}</td></tr>`; return; }
+ $('orderRows').innerHTML = (data || []).map(o => {
+  const list = Array.isArray(o.items) ? o.items.map(i => `${esc(i.name)} (x${esc(i.qty)})`).join(', ') : '';
+  const st = o.statut || 'En attente';
+  return `
+   <tr>
+    <td>#${o.id}</td>
+    <td><b>${esc(o.customer_name)}</b><br>${esc(o.phone)}</td>
+    <td>${esc(o.governorate)} - ${esc(o.delegation)}<br><span style="font-size:12px;color:#666">${esc(o.address)}</span></td>
+    <td class="items-list">${list}</td>
+    <td><b>${Number(o.total).toFixed(2)} DT</b></td>
+    <td>
+     <select onchange="updateOrderStatus(${o.id}, this.value)">
+      <option value="En attente" ${st === 'En attente' ? 'selected' : ''}>En attente</option>
+      <option value="Confirmée" ${st === 'Confirmée' ? 'selected' : ''}>Confirmée</option>
+      <option value="Livrée" ${st === 'Livrée' ? 'selected' : ''}>Livrée</option>
+      <option value="Annulée" ${st === 'Annulée' ? 'selected' : ''}>Annulée</option>
+     </select>
+    </td>
+   </tr>
+  `;
+ }).join('');
+}
+
+async function deleteMessage(id) {
+ const { error } = await sb.from('messages').delete().eq('id', id);
+ if (error) { alert(error.message); return; }
+ await loadMessages();
+}
+
+async function loadMessages() {
+ const { data, error } = await sb.from('messages').select('*').order('id', { ascending: false });
+ if (error) { $('msgRows').innerHTML = `<tr><td colspan="4">${esc(error.message)}</td></tr>`; return; }
+ $('msgRows').innerHTML = (data || []).map(m => `
+  <tr>
+   <td><b>${esc(m.author)}</b></td>
+   <td><span class="badge">${'★'.repeat(Number(m.rating) || 5)}</span></td>
+   <td>${esc(m.comment)}</td>
+   <td><button class="btn sm danger" onclick="deleteMessage(${m.id})">Supprimer</button></td>
+  </tr>
+ `).join('');
+}
+
+async function showDashboard(user) {
+ $('loginView').style.display = 'none';
+ $('appView').style.display = 'block';
+ $('adminEmail').textContent = user.email || '';
+ await Promise.all([loadProducts(), loadOrders(), loadMessages()]);
+}
+
+(async function checkSession() {
+ if (!initClient()) return;
+ const { data } = await sb.auth.getSession();
+ if (data && data.session && data.session.user) {
+  if (await verifyAdminUser(data.session.user)) {
+   showDashboard(data.session.user);
+  }
+ }
+})();
+</script>
+</body>
+</html>
